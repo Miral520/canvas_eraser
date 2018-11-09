@@ -15,7 +15,7 @@
       height: 168px;
       overflow: hidden;
       transform: translate3d(0,0,0);
-      /* background: url(pic.jpg) no-repeat center; */
+      /* background: url(resources/pic.jpg) no-repeat center; */
     }
   </style>
 </head>
@@ -31,8 +31,14 @@
   const ctx = obj.getContext('2d');
   const ctx2 = obj.getContext('2d');
 
+  // 设置半径
+  const radius = 5;
+
   // 判断是否在拖动
   let isdrag = false;
+
+  // 记录上一次的坐标
+  let lastPoint = {};
 
   // 彩色原始图片
   const pic = new Image();
@@ -46,10 +52,38 @@
   function clearArea(x,y){
     ctx2.save()
     ctx2.beginPath()
-    ctx2.arc(x,y,10,0,2*Math.PI);
-    ctx2.clip()
+    ctx2.arc(x,y,radius,0,2*Math.PI);
+
+    if(isdrag){
+      let lx = lastPoint.x;
+      let ly = lastPoint.y - radius / 2;
+      
+      let cx = x;
+      let cy = y - radius / 2;
+
+      let nWidth = Math.abs(cx - lx);
+      let nHeight = Math.abs(cy - ly);
+
+      ctx2.clearRect(lx, ly, nWidth, radius);
+      // ctx2.clip();
+    }
+
+    ctx2.clip();
     ctx2.clearRect(0,0,canvas.width,canvas.height);
     ctx2.restore();
+
+    lastPoint.x = x;
+    lastPoint.y = y;
+
+    
+
+    // lastPoint.cx1 = x;
+    // lastPoint.cy1 = y - radius / 2;
+
+    // lastPoint.cx2 = x;
+    // lastPoint.cy2 = y + radius / 2;
+
+    
   }
 
   // 获取事件中心
