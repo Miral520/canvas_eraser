@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>canvas擦除</title>
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+    }
+    #mainPic{
+      width: 300px;
+      height: 168px;
+      overflow: hidden;
+      transform: translate3d(0,0,0);
+      /* background: url(pic.jpg) no-repeat center; */
+    }
+  </style>
+</head>
+<body>
+  <div class="main" id="mainPic">
+      <canvas id="canvas" width="300" height="168"></canvas>
+  </div>
+</body>
+<script>
+  const warp = document.getElementById('mainPic');
+  // 初始化主canvas
+  const obj = document.getElementById('canvas');
+  const ctx = obj.getContext('2d');
+  const ctx2 = obj.getContext('2d');
+
+  // 判断是否在拖动
+  let isdrag = false;
+
+  // 彩色原始图片
+  const pic = new Image();
+  pic.src = "resources/pic.jpg";
+
+  // 黑白原始照片
+  const pic2 = new Image();
+  pic2.src = "resources/picb.jpg";
+
+  // 清除区域
+  function clearArea(x,y){
+    ctx2.save()
+    ctx2.beginPath()
+    ctx2.arc(x,y,10,0,2*Math.PI);
+    ctx2.clip()
+    ctx2.clearRect(0,0,canvas.width,canvas.height);
+    ctx2.restore();
+  }
+
+  // 获取事件中心
+  function getEventCenter(event){
+    let rect = obj.getBoundingClientRect();
+    let point = {};
+    point.x = event.targetTouches[0].clientX - rect.left * (obj.width / rect.width);
+    point.y = event.targetTouches[0].clientY - rect.top * (obj.height / rect.height);
+    return point;
+  }
+  
+  // 加载图片
+  pic2.onload = function () {
+    ctx.drawImage(pic, 0, 0, this.width, this.height);
+    ctx2.drawImage(this, 0, 0, this.width, this.height);
+
+    obj.addEventListener('touchstart', (e) => {
+      let eventCenter = getEventCenter(e);
+      clearArea(eventCenter.x,eventCenter.y);
+      isdrag = true;
+    });
+
+    obj.addEventListener('touchmove', (e) => {
+      let eventCenter = getEventCenter(e);
+      if(isdrag){
+        clearArea(eventCenter.x,eventCenter.y);
+      }
+    });
+
+    obj.addEventListener('touchend', (e) => {
+      isdrag = false;
+    });
+    
+  }
+  
+</script>
+</html>
